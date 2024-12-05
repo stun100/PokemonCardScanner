@@ -46,5 +46,7 @@ def resize_images_to_smallest(cards_path, output_path):
 
     print(f"All images resized to {min_width}x{min_height}.")
 
-# Example usage:
-resize_images_to_smallest("pokemon_cards", "pokemon_cards_resize")
+if __name__ == "__main__":
+    cards_path = "pokemon_cards"
+    output_path = "pokemon_cards_resized"
+    resize_images_to_smallest(cards_path, output_path)

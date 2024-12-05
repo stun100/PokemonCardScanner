@@ -119,7 +119,7 @@ def random_transform_card(cards_path, cards_picked, bg_width=480, bg_height=480)
     jittered_img = randomize_contrast_brightness(rotated_img)
 
     # Ensure the output is in RGBA format
-    # output = cv2.cvtColor(img_cv_resized, cv2.COLOR_BGRA2RGBA)
+    # output = cv2.cvtColor(jittered_img, cv2.COLOR_BGRA2RGBA)
 
     return [jittered_img, corners, card_id]
 
@@ -129,19 +129,18 @@ if __name__ == "__main__":
 
     transformed_card, corners, _ = random_transform_card(cards_path, set())
 
-    # Save or display the final image
-    cv2.imwrite('result.jpg', transformed_card)
     cv2.imshow('Result', transformed_card)
-    # cv2.waitKey(0)
+    cv2.waitKey(0)
     cv2.destroyAllWindows()
-
+    
+    transformed_card = cv2.cvtColor(transformed_card, cv2.COLOR_BGRA2RGBA)
     plt.figure(figsize=(8, 6))
     plt.imshow(transformed_card)
     plt.axis('on')
 
     # Plot and annotate the corners
     for idx, (x, y) in enumerate(corners):
-        plt.scatter(x, y, color='red', s=1)  # Mark the corner point
+        plt.scatter(x, y, color='red', s=5)  # Mark the corner point
         plt.text(x + 5, y - 10, f'({x}, {y})', color='yellow', fontsize=10, bbox=dict(facecolor='black', alpha=0.5))
 
     # Display the result

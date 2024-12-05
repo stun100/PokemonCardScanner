@@ -4,6 +4,8 @@ import numpy as np
 import cv2
 from card_transformation import random_transform_card
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+
 
 def overlay_image_alpha(background, overlay, position):
     """Overlay an image with alpha channel over a background."""
@@ -18,6 +20,7 @@ def overlay_image_alpha(background, overlay, position):
     else:
         background[y:y+h, x:x+w] = overlay  # If no alpha channel, direct copy
 
+
 def place_cards_on_background(bg_img, cards_corner_dict):
     height, width = bg_img.shape[:2]
 
@@ -25,14 +28,15 @@ def place_cards_on_background(bg_img, cards_corner_dict):
     if bg_img.shape[2] != 4:  # Check if the image has 4 channels
         bg_img = cv2.cvtColor(bg_img, cv2.COLOR_BGR2BGRA)
 
-    padding = height // 2  # Padding to add on all sides
+    padding = height // 6  # Adjust padding as per your requirement
 
-    # New dimensions with padding
     new_width = width + 2 * padding
     new_height = height + 2 * padding
 
-    # Create a padded background with zeros
+    # Create a new padded background
     padded_bg = np.zeros((new_height, new_width, 4), dtype=bg_img.dtype)
+    
+    # Place the original image in the center of the padded background
     padded_bg[padding:padding + height, padding:padding + width] = bg_img
 
     for i, (card_info, card_data) in enumerate(cards_corner_dict.items()):
@@ -40,10 +44,9 @@ def place_cards_on_background(bg_img, cards_corner_dict):
         coords = card_data['coord']
 
         card_height, card_width = card.shape[:2]
-
-        # Generate random positions within the padded dimensions
-        x = random.randint(padding, new_width - padding - card_width)
-        y = random.randint(padding, new_height - padding - card_height)
+        # Randomly position the card within the padded area
+        x = random.randint(0, new_width - card_width)
+        y = random.randint(0, new_height - card_height)
 
         # Translate the coordinates based on the random position
         coords = np.array(coords)  # Ensure coords is a NumPy array
@@ -52,24 +55,41 @@ def place_cards_on_background(bg_img, cards_corner_dict):
         # Update the dictionary with the translated coordinates
         cards_corner_dict[card_info]['coord'] = translated_coords.tolist()
 
-        # Overlay the card on the background
+        # Overlay the card on the padded background
         overlay_image_alpha(padded_bg, card, (x, y))
 
-    # Crop the padded background back to the original dimensions
-    output = padded_bg[padding:padding + height, padding:padding + width]
-
-    # Adjust coordinates to mark positions outside the original bounds as (-1, -1)
     for card_info, data in cards_corner_dict.items():
         coords = data['coord']
         updated_coords = []
+        x_coords = []
+        y_coords = []
+
         for (x, y) in coords:
-            if x < 0 or x >= width or y < 0 or y >= height:
+            if x + padding >= new_width or y + padding >= new_height:
                 updated_coords.append((-1, -1))
             else:
                 updated_coords.append((x, y))
-        cards_corner_dict[card_info]['coord'] = updated_coords
+                x_coords.append(x)
+                y_coords.append(y)
 
-    return output
+        # Calculate the bounding box if valid coordinates exist
+        if x_coords and y_coords:
+            bbox_x_min = max(0, min(x_coords))
+            bbox_y_min = max(0, min(y_coords))
+            bbox_x_max = min(width, max(x_coords))
+            bbox_y_max = min(height, max(y_coords))
+            bbox = [bbox_x_min, bbox_y_min, bbox_x_max, bbox_y_max]
+        else:
+            bbox = None  # No valid coordinates, bbox is None
+
+        cards_corner_dict[card_info]['coord'] = updated_coords
+        cards_corner_dict[card_info]['bbox'] = bbox
+
+
+    # Extract the central part of the padded image, corresponding to the original size
+    output = padded_bg[padding:padding + height, padding:padding + width]
+
+    return output, cards_corner_dict
 
 
 def create_image_with_random_cards(bg_folder, cards_path, num_cards_range=(1, 5), cards_picked=set()):
@@ -95,36 +115,54 @@ def create_image_with_random_cards(bg_folder, cards_path, num_cards_range=(1, 5)
         transformed_cards.append(transformed_card)
 
     # Place the cards on the background
-    bg_img_with_cards = place_cards_on_background(bg_img, cards_corner_dict)
-    coords = [cards_corner_dict[f'{card_id}']['coord'] for card_id in cards_corner_dict.keys()]
-    other_coords = {key: value['coord'] for key, value in cards_corner_dict.items()}
+    bg_img_with_cards, cards_corner_dict = place_cards_on_background(bg_img, cards_corner_dict)
 
-    return [bg_img_with_cards, coords, other_coords]
+    # Extract coordinates and bounding boxes
+    coords = [cards_corner_dict[f'{card_id}']['coord'] for card_id in cards_corner_dict.keys()]
+    bboxes = [cards_corner_dict[f'{card_id}']['bbox'] for card_id in cards_corner_dict.keys()]
+    other_coords = {key: {'coord': value['coord'], 'bbox': value['bbox']} for key, value in cards_corner_dict.items()}
+
+    return [bg_img_with_cards, coords, bboxes, other_coords]
 
 if __name__ == "__main__":
-    # Example usage:
     bg_folder = "backgrounds"
     cards_path = "pokemon_cards"
-    final_img, coords, _ = create_image_with_random_cards(bg_folder, cards_path)
+    final_img, coords, bboxes, _ = create_image_with_random_cards(bg_folder, cards_path)
 
     # Display the final image using OpenCV's imshow
     cv2.imshow('Final Image with Cards', final_img)
-    # cv2.waitKey(0)  # Wait for a key press
+    cv2.waitKey(0)  # Wait for a key press
     cv2.destroyAllWindows()  # Close the window when done
 
-    final_img_rgb = cv2.cvtColor(final_img, cv2.COLOR_BGR2RGB)
 
+    final_img_rgb = cv2.cvtColor(final_img, cv2.COLOR_BGR2RGB)
     # Plot the image
     plt.figure(figsize=(8, 6))
     plt.imshow(final_img_rgb)
     plt.axis('on')
 
-    # Plot and annotate the corners
-    for coord in coords:
-        for idx, (x, y) in enumerate(coord):
-            plt.scatter(x, y, color='red', s=50)  # Mark the corner point
-            plt.text(x + 5, y - 10, f'({x}, {y})', color='yellow', fontsize=10, bbox=dict(facecolor='black', alpha=0.5))
+    # Plot and annotate the bounding boxes
+    for bbox in bboxes:
+        if bbox:  # Ensure bbox is valid
+            x_min, y_min, x_max, y_max = bbox
+            # Create a rectangle patch for the bounding box
+            rect = patches.Rectangle(
+                (x_min, y_min),  # Bottom-left corner
+                x_max - x_min,  # Width
+                y_max - y_min,  # Height
+                linewidth=2,
+                edgecolor='red',
+                facecolor='none'
+            )
+            plt.gca().add_patch(rect)
+            # Annotate the bounding box
+            plt.text(
+                x_min, y_min - 10, f'({x_min}, {y_min}, {x_max}, {y_max})',
+                color='yellow',
+                fontsize=10,
+                bbox=dict(facecolor='black', alpha=0.5)
+            )
 
     # Display the result
-    plt.title("Transformed Card with Corner Annotations")
+    plt.title("Final Image with Bounding Boxes")
     plt.show()

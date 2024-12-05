@@ -2,3 +2,6 @@
 pokemon_cards
 output
 backgrounds
+model
+dataset
+make_dataset/__pycache__
