@@ -118,11 +118,9 @@ def create_image_with_random_cards(bg_folder, cards_path, num_cards_range=(1, 5)
     bg_img_with_cards, cards_corner_dict = place_cards_on_background(bg_img, cards_corner_dict)
 
     # Extract coordinates and bounding boxes
-    coords = [cards_corner_dict[f'{card_id}']['coord'] for card_id in cards_corner_dict.keys()]
-    bboxes = [cards_corner_dict[f'{card_id}']['bbox'] for card_id in cards_corner_dict.keys()]
-    other_coords = {key: {'coord': value['coord'], 'bbox': value['bbox']} for key, value in cards_corner_dict.items()}
+    bboxes = {key: {'bbox': value['bbox']} for key, value in cards_corner_dict.items()}
 
-    return [bg_img_with_cards, coords, bboxes, other_coords]
+    return [bg_img_with_cards, bboxes]
 
 if __name__ == "__main__":
     bg_folder = "backgrounds"
