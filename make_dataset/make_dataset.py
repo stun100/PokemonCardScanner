@@ -10,7 +10,7 @@ if __name__ == "__main__":
 
     dataset = {}
 
-    NUM_SAMPLES = 10
+    NUM_SAMPLES = 1000
 
     # Add tqdm to the loop
     for i in tqdm(range(NUM_SAMPLES), desc="Generating Images"):
