@@ -125,7 +125,7 @@ def create_image_with_random_cards(bg_folder, cards_path, num_cards_range=(1, 5)
 if __name__ == "__main__":
     bg_folder = "backgrounds"
     cards_path = "pokemon_cards"
-    final_img, coords, bboxes, _ = create_image_with_random_cards(bg_folder, cards_path)
+    final_img, bboxes = create_image_with_random_cards(bg_folder, cards_path)
 
     # Display the final image using OpenCV's imshow
     cv2.imshow('Final Image with Cards', final_img)
@@ -138,9 +138,10 @@ if __name__ == "__main__":
     plt.figure(figsize=(8, 6))
     plt.imshow(final_img_rgb)
     plt.axis('on')
-
+    print(bboxes)
     # Plot and annotate the bounding boxes
-    for bbox in bboxes:
+    for card_id in bboxes:
+        bbox = bboxes[card_id]["bbox"]
         if bbox:  # Ensure bbox is valid
             x_min, y_min, x_max, y_max = bbox
             # Create a rectangle patch for the bounding box
