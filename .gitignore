@@ -14,3 +14,4 @@ runs
 asdf.png
 make_dataset/constants.py
 yolo11s-seg.pt
+datasets
