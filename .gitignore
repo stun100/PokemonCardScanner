@@ -6,3 +6,4 @@ model
 dataset
 make_dataset/__pycache__
 dataset.zip
+yolo_dataset

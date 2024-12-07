@@ -91,8 +91,85 @@ def place_cards_on_background(bg_img, cards_corner_dict):
 
     return output, cards_corner_dict
 
+def place_cards_on_background_yolo(bg_img, cards_corner_dict):
+    height, width = bg_img.shape[:2]
 
-def create_image_with_random_cards(bg_folder, cards_path, num_cards_range=(1, 5), cards_picked=set()):
+    # Ensure the background image is in RGBA format
+    if bg_img.shape[2] != 4:  # Check if the image has 4 channels
+        bg_img = cv2.cvtColor(bg_img, cv2.COLOR_BGR2BGRA)
+
+    padding = height // 6  # Adjust padding as per your requirement
+
+    new_width = width + 2 * padding
+    new_height = height + 2 * padding
+
+    # Create a new padded background
+    padded_bg = np.zeros((new_height, new_width, 4), dtype=bg_img.dtype)
+    
+    # Place the original image in the center of the padded background
+    padded_bg[padding:padding + height, padding:padding + width] = bg_img
+
+    for i, (card_info, card_data) in enumerate(cards_corner_dict.items()):
+        card = card_data['card']
+        coords = card_data['coord']
+
+        card_height, card_width = card.shape[:2]
+        # Randomly position the card within the padded area
+        x = random.randint(0, new_width - card_width)
+        y = random.randint(0, new_height - card_height)
+
+        # Translate the coordinates based on the random position
+        coords = np.array(coords)  # Ensure coords is a NumPy array
+        translated_coords = coords + np.array([x - padding, y - padding])
+
+        # Update the dictionary with the translated coordinates
+        cards_corner_dict[card_info]['coord'] = translated_coords.tolist()
+
+        # Overlay the card on the padded background
+        overlay_image_alpha(padded_bg, card, (x, y))
+
+    for card_info, data in cards_corner_dict.items():
+        coords = data['coord']
+        updated_coords = []
+        x_coords = []
+        y_coords = []
+
+        for (x, y) in coords:
+            if x + padding >= new_width or y + padding >= new_height:
+                updated_coords.append((-1, -1))
+            else:
+                updated_coords.append((x, y))
+                x_coords.append(x)
+                y_coords.append(y)
+
+        # Calculate the bounding box if valid coordinates exist
+        if x_coords and y_coords:
+            bbox_x_min = max(0, min(x_coords))
+            bbox_y_min = max(0, min(y_coords))
+            bbox_x_max = min(width, max(x_coords))
+            bbox_y_max = min(height, max(y_coords))
+
+            # Convert to YOLO format (normalized values)
+            x_center = (bbox_x_min + bbox_x_max) / 2.0 / width
+            y_center = (bbox_y_min + bbox_y_max) / 2.0 / height
+            bbox_width = (bbox_x_max - bbox_x_min) / width
+            bbox_height = (bbox_y_max - bbox_y_min) / height
+
+            bbox = [x_center, y_center, bbox_width, bbox_height]
+        else:
+            bbox = None  # No valid coordinates, bbox is None
+
+        cards_corner_dict[card_info]['coord'] = updated_coords
+        cards_corner_dict[card_info]['bbox'] = bbox
+
+    # Extract the central part of the padded image, corresponding to the original size
+    output = padded_bg[padding:padding + height, padding:padding + width]
+
+    return output, cards_corner_dict
+
+
+
+def create_image_with_random_cards(bg_folder, cards_path, num_cards_range=(1, 5), cards_picked=set(), is_yolo=False):
     # Load all background images from bg_folder
     bg_files = os.listdir(bg_folder)
     bg_file = random.choice(bg_files)
@@ -115,8 +192,11 @@ def create_image_with_random_cards(bg_folder, cards_path, num_cards_range=(1, 5)
         transformed_cards.append(transformed_card)
 
     # Place the cards on the background
-    bg_img_with_cards, cards_corner_dict = place_cards_on_background(bg_img, cards_corner_dict)
-
+    if is_yolo:
+        bg_img_with_cards, cards_corner_dict = place_cards_on_background_yolo(bg_img, cards_corner_dict)
+    else:
+        bg_img_with_cards, cards_corner_dict = place_cards_on_background(bg_img, cards_corner_dict)
+        
     # Extract coordinates and bounding boxes
     bboxes = {key: {'bbox': value['bbox']} for key, value in cards_corner_dict.items()}
 
