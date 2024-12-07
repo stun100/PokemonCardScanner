@@ -1,0 +1,13 @@
+.vscode
+pokemon_cards
+output
+backgrounds
+model
+dataset
+make_dataset/__pycache__
+dataset.zip
+yolo_dataset
+yolo11n.pt
+yolo11s.pt
+runs
+asdf.png
