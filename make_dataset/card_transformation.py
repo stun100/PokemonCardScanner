@@ -41,6 +41,10 @@ def random_scaling(img, bg_width, bg_height):
 
     return scaled_img
 
+import numpy as np
+import cv2
+import random
+
 def random_skew(img):
     height, width, _ = img.shape
     # Define random skew
@@ -48,15 +52,15 @@ def random_skew(img):
     src_points = np.float32([
         [0, 0],
         [width, 0],
-        [0, height],
-        [width, height]
+        [width, height],
+        [0, height]
     ])
 
     dst_points = np.float32([
         [random.randint(0, margin), random.randint(0, margin)],  # Top-left
         [width - random.randint(0, margin), random.randint(0, margin)],  # Top-right
-        [random.randint(0, margin), height - random.randint(0, margin)],  # Bottom-left
-        [width - random.randint(0, margin), height - random.randint(0, margin)]  # Bottom-right
+        [width - random.randint(0, margin), height - random.randint(0, margin)],  # Bottom-right
+        [random.randint(0, margin), height - random.randint(0, margin)]  # Bottom-left
     ])
 
     # Perspective transform matrix
@@ -64,11 +68,26 @@ def random_skew(img):
     skewed_img = cv2.warpPerspective(img, matrix, (width, height))
 
     # Apply the transformation to the corners to get the new positions
-    corners = np.float32([[0, 0], [width, 0], [0, height], [width, height]])
-    new_corners = cv2.perspectiveTransform(np.array([corners]), matrix)
+    corners = np.float32([[0, 0], [width, 0], [width, height], [0, height]])
+    new_corners = cv2.perspectiveTransform(np.array([corners]), matrix)[0]
 
-    # Return both skewed image and new corners
-    return skewed_img, new_corners[0]
+    # Sort corners clockwise
+    # Step 1: Sort by y-coordinate (ascending)
+    sorted_by_y = sorted(new_corners, key=lambda x: x[1])
+    # Step 2: Identify top-left and top-right
+    top_two = sorted_by_y[:2]
+    top_left = min(top_two, key=lambda x: x[0])
+    top_right = max(top_two, key=lambda x: x[0])
+    # Step 3: Identify bottom-left and bottom-right
+    bottom_two = sorted_by_y[2:]
+    bottom_left = min(bottom_two, key=lambda x: x[0])
+    bottom_right = max(bottom_two, key=lambda x: x[0])
+
+    ordered_corners = np.array([top_left, top_right, bottom_right, bottom_left])
+
+    # Return both skewed image and new corners in clockwise order
+    return skewed_img, ordered_corners
+
 
 def random_rotate(img, corners, angle_range=(0, 360)):
     # rotates the card
@@ -125,7 +144,7 @@ def random_transform_card(cards_path, cards_picked, bg_width=480, bg_height=480)
 
 if __name__ == "__main__":
     # # Example usage:
-    cards_path = "pokemon_cards"
+    cards_path = "C:\\aml_dataset\\pokemon_cards"
 
     transformed_card, corners, _ = random_transform_card(cards_path, set())
 

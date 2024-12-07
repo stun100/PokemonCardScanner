@@ -4,9 +4,9 @@ import cv2
 from make_dataset_sample import create_image_with_random_cards 
 
 if __name__ == "__main__":
-    bg_folder = "backgrounds"
-    cards_path = "pokemon_cards"
-    output_path = "dataset"
+    bg_folder = "C:\\aml_dataset\\backgrounds"
+    cards_path = "C:\\aml_dataset\\pokemon_cards"
+    output_path = "C:\\aml_dataset\\dataset"
 
     dataset = {}
 
