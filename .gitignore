@@ -7,7 +7,10 @@ dataset
 make_dataset/__pycache__
 dataset.zip
 yolo_dataset
+yolo_dataset_seg
 yolo11n.pt
 yolo11s.pt
 runs
 asdf.png
+make_dataset/constants.py
+yolo11s-seg.pt

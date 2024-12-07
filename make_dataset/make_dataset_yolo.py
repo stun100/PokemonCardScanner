@@ -2,7 +2,8 @@ import os
 from tqdm import tqdm
 import cv2
 from make_dataset_sample import create_image_with_random_cards
-from make_dataset_util import COORD_K, YOLO_BBOX_K
+from make_dataset_util import YOLO_COORD_K, YOLO_BBOX_K
+from constants import *
 
 # Function to generate dataset
 def generate_samples(num_samples, prefix, image_path, label_path, is_segmentation):
@@ -21,10 +22,9 @@ def generate_samples(num_samples, prefix, image_path, label_path, is_segmentatio
         with open(os.path.join(label_path, label_filename), "w") as label_file:
             if is_segmentation:
                 for _, card_data in cards_data.items():
-                    coords = card_data[COORD_K]
-
+                    coords = card_data[YOLO_COORD_K]
                     label_file.write(f"{class_id} ")
-                    label_file.write(" ".join([f"{coord[0]} {coord[1]}" for coord in coords]) + '\n')
+                    label_file.write(" ".join([f"{coord}" for coord in coords]) + '\n')
             else:
                 for _, card_data in cards_data.items():
                     bbox = card_data[YOLO_BBOX_K]  # YOLO format: [x_center, y_center, width, height]
@@ -34,10 +34,10 @@ def generate_samples(num_samples, prefix, image_path, label_path, is_segmentatio
 
 
 if __name__ == "__main__":
-    # Define folders
-    bg_folder = "C:\\aml_dataset\\backgrounds"
-    cards_path = "C:\\aml_dataset\\pokemon_cards"
-    output_path = "C:\\aml_dataset\\dataset"
+    # Make you own constants.py under the make_dataset directory
+    bg_folder = BG_PATH
+    cards_path = CARDS_PATH
+    output_path = YOLO_SEG_PATH
     
     # Subfolders for train, val, and test
     images_train_path = os.path.join(output_path, "images", "train")
@@ -56,10 +56,10 @@ if __name__ == "__main__":
     os.makedirs(labels_test_path, exist_ok=True)
 
     # Dataset split configuration
-    TRAIN_SAMPLES = 1
-    VALIDATION_SAMPLES = 1
-    TEST_SAMPLES = 1
-    IS_SEGMENTATION = False
+    TRAIN_SAMPLES = 1200
+    VALIDATION_SAMPLES = 500
+    TEST_SAMPLES = 300
+    IS_SEGMENTATION = True
 
     # Generate training dataset
     print("Generating training dataset...")

@@ -3,6 +3,7 @@ import os
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
+from constants import CARDS_PATH
 
 def randomize_contrast_brightness(img, contrast_range=(0.8, 1.2), brightness_range=(-75, 75)):
     # Randomize contrast and brightness values
@@ -143,8 +144,8 @@ def random_transform_card(cards_path, cards_picked, bg_width=480, bg_height=480)
     return [jittered_img, corners, card_id]
 
 if __name__ == "__main__":
-    # # Example usage:
-    cards_path = "C:\\aml_dataset\\pokemon_cards"
+    # Make you own constants.py under the make_dataset directory
+    cards_path = CARDS_PATH
 
     transformed_card, corners, _ = random_transform_card(cards_path, set())
 

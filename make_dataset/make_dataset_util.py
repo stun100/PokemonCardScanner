@@ -4,6 +4,7 @@ CARD_K = 'card'
 YOLO_BBOX_K = 'yolo_bbox_k'
 BBOX_K = 'bbox'
 COORD_K = 'coord'
+YOLO_COORD_K = 'yolo_coord_k'
 
 ### Translates the coordinates of the corner of the cards, that can be randomly placed outside, inside the background
 def calculate_intersection_points(bg_img, coords):
@@ -55,7 +56,10 @@ def calculate_intersection_points(bg_img, coords):
         center = visible_points.mean(axis=0)
         visible_points = sorted(visible_points, key=lambda p: np.arctan2(p[1] - center[1], p[0] - center[0]))
 
-    return visible_points
+    normalized_points = [(x / width, y / height) for x, y in visible_points]
+    visible_points_yolo = [coord for point in normalized_points for coord in point]
+    
+    return visible_points, visible_points_yolo
 
 # Define the bounding boxes (with and without yolo format) of a card given its coordinates. 
 def define_bounding_box(coords, height, width):

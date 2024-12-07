@@ -2,11 +2,13 @@ import json
 from tqdm import tqdm 
 import cv2
 from make_dataset_sample import create_image_with_random_cards 
+from constants import CARDS_PATH, BG_PATH, OUTPUT_PATH
 
 if __name__ == "__main__":
-    bg_folder = "C:\\aml_dataset\\backgrounds"
-    cards_path = "C:\\aml_dataset\\pokemon_cards"
-    output_path = "C:\\aml_dataset\\dataset"
+    # Make you own constants.py under the make_dataset directory
+    bg_folder = BG_PATH
+    cards_path = CARDS_PATH
+    output_path = OUTPUT_PATH
 
     dataset = {}
 

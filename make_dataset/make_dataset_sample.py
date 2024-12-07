@@ -8,8 +8,9 @@ from card_transformation import random_transform_card
 # importing utils functions
 from make_dataset_util import calculate_intersection_points, define_bounding_box, overlay_image_alpha
 # importing utils constants
-from make_dataset_util import CARD_K, BBOX_K, YOLO_BBOX_K, COORD_K
+from make_dataset_util import CARD_K, BBOX_K, YOLO_BBOX_K, COORD_K, YOLO_COORD_K
 
+from constants import CARDS_PATH, BG_PATH
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
@@ -47,8 +48,9 @@ def place_cards_on_background(bg_img, cards_corner_dict):
         # Update the dictionary with the translated coordinates
         cards_corner_dict[card_info][COORD_K] = translated_coords.tolist()
    
-        intersection_points = calculate_intersection_points(bg_img, translated_coords)
+        intersection_points, intersection_points_yolo  = calculate_intersection_points(bg_img, translated_coords)
         cards_corner_dict[card_info][COORD_K] = intersection_points
+        cards_corner_dict[card_info][YOLO_COORD_K] = intersection_points_yolo
 
         # define the bounding box (both with and without YOLO format)
         bbox, yolo_bbox = define_bounding_box(intersection_points, height, width)
@@ -94,15 +96,17 @@ def create_image_with_random_cards(bg_folder, cards_path, num_cards_range=(1, 5)
         key: {
             BBOX_K: value[BBOX_K],
             YOLO_BBOX_K: value[YOLO_BBOX_K],
-            COORD_K: value[COORD_K]
+            COORD_K: value[COORD_K],
+            YOLO_COORD_K: value[YOLO_COORD_K]
         } for key, value in cards_corner_dict.items()
     }
 
     return bg_img_with_cards, card_data
 
 if __name__ == "__main__":
-    bg_folder = "C:\\aml_dataset\\backgrounds"
-    cards_path = "C:\\aml_dataset\\pokemon_cards"
+    # Make you own constants.py under the make_dataset directory
+    bg_folder = BG_PATH
+    cards_path = CARDS_PATH
 
     final_img, cards_data = create_image_with_random_cards(bg_folder, cards_path)
 
