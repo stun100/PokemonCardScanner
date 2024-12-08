@@ -37,7 +37,7 @@ if __name__ == "__main__":
     # Make you own constants.py under the make_dataset directory
     bg_folder = BG_PATH
     cards_path = CARDS_PATH
-    output_path = YOLO_SEG_PATH
+    output_path = "datasets/yolo_dataset_seg2"
     
     # Subfolders for train, val, and test
     images_train_path = os.path.join(output_path, "images", "train")
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     os.makedirs(labels_test_path, exist_ok=True)
 
     # Dataset split configuration
-    TRAIN_SAMPLES = 5000
+    TRAIN_SAMPLES = 2000
     VALIDATION_SAMPLES = 1000
     TEST_SAMPLES = 500
     IS_SEGMENTATION = True

@@ -16,3 +16,5 @@ make_dataset/constants.py
 yolo11s-seg.pt
 datasets
 yolo11m-seg.pt
+hashes_dphash_16.json
+yolo11x-seg.pt
