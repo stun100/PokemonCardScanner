@@ -81,6 +81,7 @@ def create_image_with_random_cards(bg_folder, cards_path, num_cards_range=(1, 5)
     # Create a list of transformed cards
     transformed_cards = []
     cards_corner_dict = {}
+ 
     for _ in range(num_cards):
         transformed_card, card_corners, card_id = random_transform_card(cards_path, cards_picked)
         cards_corner_dict[f'{card_id}'] = {}

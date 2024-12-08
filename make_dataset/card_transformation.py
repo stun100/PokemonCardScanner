@@ -118,7 +118,14 @@ def random_rotate(img, corners, angle_range=(0, 360)):
 
 def random_transform_card(cards_path, cards_picked, bg_width=480, bg_height=480):
     # Load random card from the directory
-    card_file = random.choice(list(set(os.listdir(cards_path)).difference(cards_picked)))
+    available_files = list(set(os.listdir(cards_path)).difference(cards_picked))
+    # Check if any files are available
+    if not available_files:
+        print("Picked every card! Resetting the set.")
+        cards_picked = set()
+        available_files = list(set(os.listdir(cards_path)).difference(cards_picked))
+    
+    card_file = random.choice(available_files)
     card_id = card_file.split(".")[0]
     cards_picked.add(card_file)
     card_path = os.path.join(cards_path, card_file)

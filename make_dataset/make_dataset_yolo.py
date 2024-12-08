@@ -56,9 +56,9 @@ if __name__ == "__main__":
     os.makedirs(labels_test_path, exist_ok=True)
 
     # Dataset split configuration
-    TRAIN_SAMPLES = 1200
-    VALIDATION_SAMPLES = 500
-    TEST_SAMPLES = 300
+    TRAIN_SAMPLES = 5000
+    VALIDATION_SAMPLES = 1000
+    TEST_SAMPLES = 500
     IS_SEGMENTATION = True
 
     # Generate training dataset
