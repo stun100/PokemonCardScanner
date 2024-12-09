@@ -16,7 +16,7 @@ def get_card_dimensions(corners):
     height = np.linalg.norm(corners[1] - corners[2])
     return width, height
 
-def perspective_transform(image, mask, mirror):
+def perspective_transform(image, mask, mirror=False):
     # Convert the boolean mask to uint8
     mask_uint8 = mask.astype(np.uint8) * 255
 

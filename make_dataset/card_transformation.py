@@ -33,11 +33,11 @@ def randomize_contrast_brightness(img, contrast_range=(0.8, 1.2), brightness_ran
     return adjusted_img
 
 def random_scaling(img, bg_width, bg_height):
-    scale = random.uniform(0.3, 0.45) # Random scaling factor between 0.5 and 1.5
+    scale = random.uniform(0.25, 0.5)
     scaled_img = cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_LINEAR)
 
     while (scaled_img.shape[0] >= bg_width // 2 and scaled_img.shape[1] >= bg_height // 2): # we want cards that take at most half the background
-        scale = random.uniform(0.45, 0.65) # Random scaling factor between 0.5 and 1.5
+        scale = random.uniform(0.5, 0.75)
         scaled_img = cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_LINEAR)
 
     return scaled_img
@@ -49,7 +49,7 @@ import random
 def random_skew(img):
     height, width, _ = img.shape
     # Define random skew
-    margin = int(0.2 * min(width, height))
+    margin = int(0.15 * min(width, height))
     src_points = np.float32([
         [0, 0],
         [width, 0],

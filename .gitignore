@@ -18,3 +18,12 @@ datasets
 yolo11m-seg.pt
 yolo11x-seg.pt
 make_dataset/test-images-with-rotation.csv
+yolo11x-seg.pt
+best.pt
+seg_weight.pt
+yolo11s-seg.pt
+hashes_dphash_16.json
+yolov11.yaml
+test1.jpg
+test2.jpg
+binder.mp4
