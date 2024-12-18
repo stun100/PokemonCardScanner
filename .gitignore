@@ -27,3 +27,16 @@ yolov11.yaml
 test1.jpg
 test2.jpg
 binder.mp4
+card_scanner_master
+card-scanner-master.zip
+yolo11n-seg.pt
+last_seg_weight_int8_openvino_model
+last_seg_weight_ncnn_model
+last_seg_weight_saved_model
+__pycache__
+last_seg_weight.mnn
+calibration_image_sample_data_20x128x128x3_float32.npy
+last_seg_weight.onnx
+last_seg_weight.pb
+last_seg_weight.pt
+last_seg_weight.torchscript
