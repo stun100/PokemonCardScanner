@@ -22,7 +22,6 @@ yolo11x-seg.pt
 best.pt
 seg_weight.pt
 yolo11s-seg.pt
-hashes_dphash_16.json
 yolov11.yaml
 test1.jpg
 test2.jpg
@@ -40,3 +39,4 @@ last_seg_weight.onnx
 last_seg_weight.pb
 last_seg_weight.pt
 last_seg_weight.torchscript
+card_scanner/__pycache__
