@@ -119,7 +119,7 @@ class VideoFrameBuilder:
             height, width = frame.shape[:2]
             # Initialize the output video
             codec = cv2.VideoWriter_fourcc(*'mp4v')
-            self.video_writer = cv2.VideoWriter(f'E:\\universita\\aml\\card-scanner-master\\output\\output_video.mp4', codec, self.fps, (width, height))
+            self.video_writer = cv2.VideoWriter(f'test_output_video.mp4', codec, self.fps, (width, height))
         self.video_writer.write(frame)
 
 
